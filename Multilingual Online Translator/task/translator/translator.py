@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import argparse
+import sys
 
 supported_languages = 'Arabic German English Spanish French ' \
                       'Hebrew Japanese Dutch Polish ' \
@@ -27,7 +28,13 @@ def get_input():
     args = parser.parse_args()
 
     src_language = args.src_language
+    if src_language not in supported_languages + ['all']:
+        print(f"Sorry, the program doesn't support {src_language}")
+        sys.exit()
     trgt_language = args.trgt_language
+    if trgt_language not in supported_languages + ['all']:
+        print(f"Sorry, the program doesn't support {trgt_language}")
+        sys.exit()
     word_to_translate = args.word_to_translate
 
     if trgt_language == 'all':
@@ -38,12 +45,16 @@ def get_input():
 
 def make_request(src_language, trgt_language, word_to_translate):
     url = f'https://context.reverso.net/translation/{src_language}-{trgt_language}/{word_to_translate}'
-    while True:
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        r = requests.get(url, headers=headers)
-        if r.status_code == 200:
-            break
-    return r.content
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    r = requests.get(url, headers=headers)
+    if r.status_code == 404:
+        print(f'Sorry, unable to find {word_to_translate}')
+        sys.exit()
+    elif r.status_code != 200:
+        print('Something wrong with your internet connection')
+        sys.exit()
+    else:
+        return r.content
 
 
 def find_word_translations(content):
@@ -69,7 +80,7 @@ def to_all_languages():
         web_content = make_request(src_language, language, word_to_translate)
         soup = BeautifulSoup(web_content, 'html.parser')
         all_links = soup.select('a.translation.dict')
-        word = all_links[0].get_text()
+        word = all_links[0].get_text().strip('\n')
         msg = f"{language.title()} Translations:"
         write_to_file(msg)
         write_to_file(word)

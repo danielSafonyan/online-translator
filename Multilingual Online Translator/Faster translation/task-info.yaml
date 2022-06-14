@@ -173,13 +173,13 @@ files:
 - name: translator/testing_script.py
   visible: true
   learner_created: true
-- name: translator/hello.txt
-  visible: true
-  learner_created: true
 - name: translator/little_test.py
   visible: true
   learner_created: true
-- name: love.txt
+- name: translator/hello.txt
+  visible: true
+  learner_created: true
+- name: translator/cat.txt
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/projects/99/stages/548/implement#comment
