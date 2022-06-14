@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import argparse
 
 supported_languages = 'Arabic German English Spanish French ' \
                       'Hebrew Japanese Dutch Polish ' \
@@ -12,26 +13,27 @@ def write_to_file(line):
         file.write(line + '\n')
 
 
-def welcoming_message():
-    print('Hello, welcome to the translator. Translator supports: ')
-    for key in dict_supported_languages:
-        print(f"{key}. {dict_supported_languages[key].title()}")
+def print_file():
+    with open(f'{word_to_translate}.txt', 'r', encoding='utf-8') as file:
+        print(file.read())
 
 
 def get_input():
-    print('Type the number of your language:')
-    src_language = input()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('src_language')
+    parser.add_argument('trgt_language')
+    parser.add_argument('word_to_translate')
 
-    print('Type the number of language you want to translate to:')
-    trgt_language = input()
+    args = parser.parse_args()
 
-    print('Type the word you want to translate:')
-    word_to_translate = input()
+    src_language = args.src_language
+    trgt_language = args.trgt_language
+    word_to_translate = args.word_to_translate
 
-    if trgt_language == '0':
-        return dict_supported_languages[src_language], '0', word_to_translate
+    if trgt_language == 'all':
+        return src_language, 'all', word_to_translate
     else:
-        return dict_supported_languages[src_language], dict_supported_languages[trgt_language], word_to_translate
+        return src_language, trgt_language, word_to_translate
 
 
 def make_request(src_language, trgt_language, word_to_translate):
@@ -40,7 +42,6 @@ def make_request(src_language, trgt_language, word_to_translate):
         headers = {'User-Agent': 'Mozilla/5.0'}
         r = requests.get(url, headers=headers)
         if r.status_code == 200:
-            print()
             break
     return r.content
 
@@ -54,12 +55,9 @@ def find_word_translations(content):
         word_translations.append(word)
 
     msg = f"{trgt_language.title()} Translations"
-    print(msg)
     write_to_file(msg)
     for word in word_translations:
-        print(word)
         write_to_file(word)
-    print()
     write_to_file('')
 
 
@@ -71,13 +69,10 @@ def to_all_languages():
         web_content = make_request(src_language, language, word_to_translate)
         soup = BeautifulSoup(web_content, 'html.parser')
         all_links = soup.select('a.translation.dict')
-        word = all_links[0].find('span', class_='display-term').get_text()
+        word = all_links[0].get_text()
         msg = f"{language.title()} Translations:"
-        print(msg)
         write_to_file(msg)
-        print(word)
         write_to_file(word)
-        print()
         write_to_file('')
 
         all_links = soup.find_all('div', class_='src ltr')
@@ -88,12 +83,9 @@ def to_all_languages():
         trgt_example = example.strip('\r\n ')
 
         msg = f"{language.title()} Example:"
-        print(msg)
         write_to_file(msg)
         #
-        print(src_example)
         write_to_file(src_example)
-        print(trgt_example)
         write_to_file(trgt_example)
         write_to_file('')
 
@@ -116,29 +108,26 @@ def find_word_usage_examples(content):
         trg_usage_examples.append(example)
 
     msg = f"{trgt_language.title()} Examples"
-    print(msg)
     write_to_file(msg)
 
     combined_translations = zip(src_usage_examples, trg_usage_examples)
     for src, trg in combined_translations:
-        print(src)
         write_to_file(src)
 
-        print(trg)
         write_to_file(trg)
 
-        print()
         write_to_file('')
 
 
-welcoming_message()
+# welcoming_message()
 src_language, trgt_language, word_to_translate = get_input()
-if trgt_language == '0':
+if trgt_language == 'all':
     to_all_languages()
 else:
     web_content = make_request(src_language, trgt_language, word_to_translate)
     find_word_translations(web_content)
     find_word_usage_examples(web_content)
+print_file()
 
 
 

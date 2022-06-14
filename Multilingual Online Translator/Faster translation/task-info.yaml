@@ -170,6 +170,21 @@ files:
     if __name__ == '__main__':
         TranslatorTest('translator.translator').run_tests()
   learner_created: false
+- name: translator/testing_script.py
+  visible: true
+  learner_created: true
+- name: translator/hello.txt
+  visible: true
+  learner_created: true
+- name: translator/little_test.py
+  visible: true
+  learner_created: true
+- name: love.txt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/99/stages/548/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Tue, 14 Jun 2022 12:46:31 UTC
 record: -1

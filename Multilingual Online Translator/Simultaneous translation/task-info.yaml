@@ -180,9 +180,6 @@ files:
 - name: translator/testing_script.py
   visible: true
   learner_created: true
-- name: what.txt
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/projects/99/stages/547/implement#comment
 status: Solved
 feedback:
